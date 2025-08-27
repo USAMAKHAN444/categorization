@@ -10,7 +10,8 @@ export const GivebackPortal: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [results, setResults] = useState<ClassificationResult>({});
-  const serverEndpoint = import.meta.env.VITE_API_ENDPOINT || '/api/categorize-simple';
+  const serverEndpoint = import.meta.env.VITE_API_ENDPOINT || 
+    (import.meta.env.DEV ? 'http://34.222.0.221/categorize' : '/api/categorize-simple');
   const [fileUrls, setFileUrls] = useState<{ [key: string]: string }>({});
 
   const { toast } = useToast();

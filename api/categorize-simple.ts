@@ -4,24 +4,24 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('Simple API function called');
-    
-    const response = await fetch('http://34.222.0.221/categorize', {
-      method: 'POST',
-      body: req.body,
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    const backendUrl = 'http://34.222.0.221/categorize';
+    const headers = {};
+    if (typeof req.headers['content-type'] === 'string') {
+      headers['content-type'] = req.headers['content-type'];
     }
 
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ 
-      error: 'Failed to process request',
-      details: error.message 
+    const response = await fetch(backendUrl, {
+      method: 'POST',
+      body: req,
+      headers,
     });
+
+    const text = await response.text();
+    res.status(response.status);
+    res.setHeader('content-type', response.headers.get('content-type') || 'application/json');
+    return res.send(text);
+  } catch (error) {
+    console.error('Error proxying to backend:', error);
+    return res.status(500).json({ error: 'Proxy failure', details: error?.message || 'Unknown error' });
   }
 }
