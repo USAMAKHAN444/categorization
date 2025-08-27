@@ -10,7 +10,7 @@ export const GivebackPortal: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [results, setResults] = useState<ClassificationResult>({});
-  const serverEndpoint = 'http://34.222.0.221/categorize';
+  const serverEndpoint = import.meta.env.VITE_API_ENDPOINT || 'http://34.222.0.221/categorize';
   const [fileUrls, setFileUrls] = useState<{ [key: string]: string }>({});
 
   const { toast } = useToast();
@@ -58,9 +58,20 @@ export const GivebackPortal: React.FC = () => {
       });
     } catch (error) {
       console.error('Processing error:', error);
+      console.error('Server endpoint:', serverEndpoint);
+      
+      let errorMessage = "An error occurred during processing";
+      if (error instanceof Error) {
+        if (error.message.includes('Failed to fetch')) {
+          errorMessage = `Cannot connect to server at ${serverEndpoint}. Please check if the server is running and accessible.`;
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Processing failed",
-        description: error instanceof Error ? error.message : "An error occurred during processing",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
