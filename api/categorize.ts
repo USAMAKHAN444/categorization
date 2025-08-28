@@ -6,32 +6,45 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Forward the original multipart/form-data stream as-is to the FastAPI server
+    console.log('Main categorize function called - forwarding to backend');
+    console.log('Content-Type:', req.headers['content-type']);
+    
     const backendUrl = 'https://gb-ocr-stage.vertekx.com/categorize';
-
-    const forwardHeaders: Record<string, string> = {};
-    if (typeof req.headers['content-type'] === 'string') {
-      forwardHeaders['content-type'] = req.headers['content-type'];
-    }
 
     const response = await fetch(backendUrl, {
       method: 'POST',
-      // In Node, IncomingMessage is a readable stream, which fetch can use as body
-      body: req as unknown as ReadableStream,
-      headers: forwardHeaders,
+      body: req.body, // Use req.body for proper handling
+      headers: {
+        'Content-Type': req.headers['content-type'] || 'multipart/form-data',
+      },
     });
 
-    // Pipe back the exact response from FastAPI
-    const text = await response.text();
-    res.status(response.status);
-    const ct = response.headers.get('content-type') || 'application/json';
-    res.setHeader('content-type', ct);
-    return res.send(text);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Backend error: ${response.status} - ${errorText}`);
+      return res.status(response.status).json({ 
+        error: 'Backend error', 
+        status: response.status,
+        details: errorText 
+      });
+    }
+
+    const data = await response.json();
+    console.log('Successfully forwarded request to backend');
+    return res.json(data);
+    
   } catch (error: any) {
-    console.error('Proxy error:', error);
+    console.error('Main function error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      type: error.constructor.name
+    });
+    
     return res.status(500).json({
-      error: 'Proxy failure',
-      details: error?.message || 'Unknown error',
+      error: 'Main function failed',
+      details: error.message,
+      type: error.constructor.name
     });
   }
 }
