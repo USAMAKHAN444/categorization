@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const backendUrl = 'http://34.222.0.221/categorize';
+    const backendUrl = 'https://gb-ocr-stage.vertekx.com/categorize';
     const headers = {};
     if (typeof req.headers['content-type'] === 'string') {
       headers['content-type'] = req.headers['content-type'];

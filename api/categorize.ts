@@ -7,7 +7,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     // Forward the original multipart/form-data stream as-is to the FastAPI server
-    const backendUrl = 'http://34.222.0.221/categorize';
+    const backendUrl = 'https://gb-ocr-stage.vertekx.com/categorize';
 
     const forwardHeaders: Record<string, string> = {};
     if (typeof req.headers['content-type'] === 'string') {
