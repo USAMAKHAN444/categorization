@@ -1,5 +1,13 @@
 export default async function handler(req, res) {
+  console.log('=== VERCEL FUNCTION START ===');
+  console.log('Method:', req.method);
+  console.log('URL:', req.url);
+  console.log('Headers:', req.headers);
+  console.log('Body type:', typeof req.body);
+  console.log('Body size:', req.body ? 'Has body' : 'No body');
+  
   if (req.method !== 'POST') {
+    console.log('Method not allowed, returning 405');
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -21,10 +29,14 @@ export default async function handler(req, res) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`Backend error: ${response.status} - ${errorText}`);
-      return res.status(response.status).json({ 
-        error: 'Backend error', 
+      console.error('Response headers:', Object.fromEntries(response.headers.entries()));
+      
+      // Return the exact error from your backend
+      return res.status(500).json({ 
+        error: 'Backend server error', 
         status: response.status,
-        details: errorText 
+        details: errorText,
+        headers: Object.fromEntries(response.headers.entries())
       });
     }
 
