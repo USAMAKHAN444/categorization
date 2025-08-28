@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     console.log('Ping endpoint called');
     
     // Test basic fetch
-    const response = await fetch('http://34.222.0.221/health');
+    const response = await fetch('https://gb-ocr-stage.vertekx.com/health');
     
     if (response.ok) {
       const data = await response.text();
